@@ -6,7 +6,12 @@ describe('store/index.jsのテスト', () => {
     // store生成時のstate初期値をテストする
     expect(store.getState()).toStrictEqual({
       todos: [],
-      visibleFilter: SHOW_ALL
+      visibleFilter: SHOW_ALL,
+      quizInfo: {
+        isLoading: false,
+        quizzes: [],
+        error: null
+      }
     });
   });
 });
