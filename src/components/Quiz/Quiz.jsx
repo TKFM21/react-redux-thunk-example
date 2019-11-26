@@ -1,30 +1,63 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { fetchQuizzes } from '../../actions/quizActionCreator';
+import { fetchQuizzes, correctJudge, incorrectJudge } from '../../actions/quizActionCreator';
 
 
-const Quiz = (props) => {
-    if (!props.quizInfo.isLoading && !props.quizInfo.quizzes.length && !props.quizInfo.error) {
-        props.fetchQuizzes();
+class Quiz extends React.Component {
+    constructor(props) {
+        super(props);
+        this.onClickHandler = this.onClickHandler.bind(this);
     }
-    const quizzes = props.quizInfo.quizzes.map( (quiz, index) => {
+    componentDidMount() {
+        this.props.fetchQuizzes();
+    }
+
+    onClickHandler(quiz, answer) {
+        if (answer === quiz.correctAnswer) {
+            window.alert('Correct');
+            this.props.correctJudge();
+        } else {
+            window.alert('Incorrect');
+            this.props.incorrectJudge();
+        }
+    }
+
+    render() {
+        if (this.props.quizInfo.isLoading) {
+            return (
+                <div>
+                    <h1>Quiz</h1>
+                    <p>Now Loading...</p>
+                    <hr/>
+                    <Link to="/">Home</Link>
+                </div>
+            );
+        }
+        if (this.props.quizInfo.currentIndex >= this.props.quizInfo.quizzes.length) {
+            return (
+                <div>
+                    <h1>Quiz</h1>
+                    <p>Result</p>
+                    <p>{this.props.quizInfo.numberOfCorrected}/{this.props.quizInfo.quizzes.length}</p>
+                    <button onClick={this.props.fetchQuizzes}>Restart</button>
+                    <hr/>
+                    <Link to="/">Home</Link>
+                </div>
+            )
+        }
+        const quiz = this.props.quizInfo.quizzes[this.props.quizInfo.currentIndex];
+        const answers = quiz.answers().map( (answer, index) => <p key={index} onClick={() => this.onClickHandler(quiz, answer)}>{answer}</p>);
         return (
-            <div key={index}>
-                {quiz.question}
+            <div>
+                <h1>Quiz</h1>
+                <p>{quiz.question}</p>
+                {answers}
+                <hr/>
+                <Link to="/">Home</Link>
             </div>
         );
-    });
-    return (
-        <div>
-            <button onClick={props.fetchQuizzes}>add</button>
-            <div>
-                {props.quizInfo.isLoading ? 'Now Loading...' : ''}
-                {props.quizInfo.error}
-                <hr/>
-                {quizzes}
-            </div>
-        </div>
-    )
+    }
 }
 
 const mapStateToProps = (state) => {
@@ -37,6 +70,14 @@ const mapDispatchToProps = (dispatch) => {
     return {
         fetchQuizzes: () => {
             dispatch(fetchQuizzes());
+        },
+        correctJudge: () => {
+            const correctAction = correctJudge();
+            dispatch(correctAction);
+        },
+        incorrectJudge: () => {
+            const incorrectAction = incorrectJudge();
+            dispatch(incorrectAction);
         }
     };
 };

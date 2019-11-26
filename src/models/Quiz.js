@@ -1,5 +1,3 @@
-import QuizFetcher from '../data_fetchers/quizFetcher';
-
 class Quiz {
     constructor({ question, correctAnswer, incorrectAnswers }) {
         this._question = question;
@@ -19,9 +17,8 @@ class Quiz {
         return [ this._correctAnswer, ...this._incorrectAnswers ];
     }
 
-    static async fetchQuizzesAndInstanceArray() {
-        const quizzes = await QuizFetcher.fetch();
-        return quizzes.map( quiz => {
+    static fetchQuizzesAndInstanceArray(results) {
+        return results.map( quiz => {
             const data = {
                 question: quiz.question,
                 correctAnswer: quiz.correct_answer,
